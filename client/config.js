@@ -2,5 +2,5 @@
 // 예) SERVER_URL: 'https://frost-popit-server.onrender.com'
 // (바꾸지 않으면 지금 열린 페이지 주소를 서버로 사용해요 → 로컬 테스트용)
 window.POPIT_CONFIG = {
-  SERVER_URL: 'https://YOUR-RENDER-APP.onrender.com',
+  SERVER_URL: 'https://new-game-u8xs.onrender.com',
 };
