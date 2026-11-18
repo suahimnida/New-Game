@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: frost-popit-server
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOWED_ORIGIN
+        value: "*"   # 배포 후 Vercel 주소로 바꾸면 더 안전해요. 예) https://frost-popit.vercel.app

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>서리빛 팝잇 거래소 ❄</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❄</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="snow"></canvas>
+  <div class="aurora"><span></span><span></span><span></span></div>
+  <div class="mountains"></div>
+
+  <!-- 로딩 -->
+  <section id="screen-loading" class="screen active">
+    <div class="loading-box">
+      <div class="logo big">서리빛 <em>팝잇</em> 거래소</div>
+      <div class="orb-spinner"></div>
+      <p id="loading-msg">얼음 성으로 가는 길을 여는 중…</p>
+    </div>
+  </section>
+
+  <!-- 프로필 만들기 -->
+  <section id="screen-profile" class="screen">
+    <form id="profile-form" class="panel glass profile-card" autocomplete="off">
+      <div class="logo">서리빛 <em>팝잇</em> 거래소</div>
+      <p class="sub">겨울 요정들의 팝잇 시장에 오신 걸 환영해요!<br/>나만의 프로필을 만들면 <b class="gold">2000 코인</b>을 선물로 드려요.</p>
+      <div class="pf-preview"><div id="pf-avatar" class="avatar xl"></div><div id="pf-name-preview" class="pf-name">닉네임</div></div>
+      <label class="field"><span>닉네임 (2~12자)</span><input id="pf-nickname" maxlength="12" placeholder="예) 눈꽃수아" required /></label>
+      <label class="field"><span>한 줄 소개</span><input id="pf-bio" maxlength="30" placeholder="예) 고양이 팝잇 모으는 중!" /></label>
+      <div class="field"><span>얼굴 고르기</span><div id="pf-faces" class="face-grid"></div></div>
+      <div class="field"><span>색 고르기</span><div id="pf-colors" class="color-row"></div></div>
+      <p id="pf-error" class="error"></p>
+      <button class="btn primary wide" type="submit">✨ 프로필 만들고 시작하기</button>
+      <p class="hint">❄ 프로필은 한 기기에 1개만 만들 수 있어요.</p>
+    </form>
+  </section>
+
+  <!-- 메인 -->
+  <section id="screen-main" class="screen">
+    <header class="topbar glass">
+      <div class="logo small">서리빛 <em>팝잇</em> 거래소</div>
+      <div class="me-chip" id="me-chip"></div>
+      <div class="coin-badge"><span class="coin"></span><b id="coin-count">0</b></div>
+      <div class="online-badge"><i id="conn"></i>접속 <b id="online-count">0</b>명</div>
+    </header>
+
+    <main class="main-grid">
+      <section class="panel glass collection">
+        <div class="panel-title"><h2>내 팝잇 보관함</h2><span class="dex-count">도감 <b id="dex-count">0</b>/11</span></div>
+        <div id="dex" class="dex"></div>
+        <div id="inventory" class="inv-grid"></div>
+      </section>
+
+      <section class="panel glass center">
+        <div class="machine" id="machine">
+          <div class="globe">
+            <div class="globe-shine"></div>
+            <div class="capsules" id="capsules"></div>
+          </div>
+          <div class="machine-base"><div class="slot"></div><span>❄ 눈송이 뽑기 ❄</span></div>
+        </div>
+        <button id="btn-gacha" class="btn primary huge">🎁 뽑기 <small>100코인</small></button>
+        <button id="btn-trade" class="btn trade huge">⇄ 거래하기</button>
+        <ul class="rules">
+          <li>뽑기 확률 · 일반 56% · 희귀 27% · 영웅 15% · <span class="gold">전설 2%</span></li>
+          <li>거래가 끝나면 두 사람 모두 <b class="gold">+50 코인</b></li>
+        </ul>
+      </section>
+
+      <section class="panel glass players">
+        <div class="panel-title"><h2>광장의 친구들</h2></div>
+        <div id="player-list" class="player-list"></div>
+      </section>
+    </main>
+  </section>
+
+  <!-- 거래 상대 고르기 -->
+  <div id="modal-pick" class="modal"><div class="modal-card glass">
+    <button class="x" data-close="modal-pick">✕</button>
+    <h3>누구와 거래할까요?</h3>
+    <div id="pick-list" class="player-list"></div>
+  </div></div>
+
+  <!-- 거래 초대 -->
+  <div id="modal-invite" class="modal"><div class="modal-card glass invite-card">
+    <div id="invite-avatar" class="avatar xl"></div>
+    <h3 id="invite-title"></h3>
+    <p id="invite-bio" class="muted"></p>
+    <div class="invite-timer"><i id="invite-bar"></i></div>
+    <div class="row">
+      <button id="invite-no" class="btn ghost">거절</button>
+      <button id="invite-yes" class="btn primary">거래판 열기</button>
+    </div>
+  </div></div>
+
+  <!-- 뽑기 결과 -->
+  <div id="modal-reveal" class="modal"><div class="modal-card glass reveal-card">
+    <div class="rays"></div>
+    <div id="reveal-new" class="new-tag">NEW!</div>
+    <div id="reveal-art" class="reveal-art"></div>
+    <div id="reveal-rarity" class="rarity-tag"></div>
+    <h3 id="reveal-name"></h3>
+    <div class="row">
+      <button class="btn ghost" data-close="modal-reveal">확인</button>
+      <button id="reveal-again" class="btn primary">한 번 더! (100)</button>
+    </div>
+  </div></div>
+
+  <!-- 팝잇 상세 (눌러보기) -->
+  <div id="modal-popit" class="modal"><div class="modal-card glass popit-card">
+    <button class="x" data-close="modal-popit">✕</button>
+    <div id="popit-rarity" class="rarity-tag"></div>
+    <h3 id="popit-name"></h3>
+    <div id="popit-art" class="popit-big"></div>
+    <p class="muted">버블을 눌러보세요! 뽁 ✨</p>
+    <button id="popit-reset" class="btn ghost">🔄 뒤집기</button>
+  </div></div>
+
+  <!-- 거래 완료 -->
+  <div id="modal-done" class="modal"><div class="modal-card glass done-card">
+    <div class="rays"></div>
+    <h3>🎉 거래 완료!</h3>
+    <p id="done-text" class="muted"></p>
+    <div id="done-items" class="done-items"></div>
+    <div class="reward"><span class="coin"></span> +50 코인 획득!</div>
+    <button class="btn primary" data-close="modal-done">좋아요</button>
+  </div></div>
+
+  <!-- 거래판 -->
+  <div id="trade" class="trade-overlay">
+    <div class="trade-frame">
+      <div class="trade-board">
+        <span class="corner tl">❄</span><span class="corner tr">❄</span><span class="corner bl">❄</span><span class="corner br">❄</span>
+        <div class="tb-head">
+          <h2>❄ 얼음 거래판 ❄</h2>
+          <button id="tb-cancel" class="btn ghost sm">거래 취소</button>
+        </div>
+        <div class="tb-sides">
+          <div class="tb-side" id="tb-me">
+            <div class="tb-user"></div>
+            <div class="emote-stage"></div>
+            <div class="tb-slots"></div>
+            <div class="tb-ready"></div>
+          </div>
+          <div class="tb-mid">
+            <div class="swap-icon">⇄</div>
+            <div class="mid-reward"><span class="coin"></span>+50<br/><small>각자 지급</small></div>
+          </div>
+          <div class="tb-side partner" id="tb-partner">
+            <div class="tb-user"></div>
+            <div class="emote-stage"></div>
+            <div class="tb-slots"></div>
+            <div class="tb-ready"></div>
+          </div>
+        </div>
+        <div class="tb-emojis" id="tb-emojis"></div>
+        <div class="tb-inv-wrap">
+          <div class="tb-inv-title">내 보관함 <small>눌러서 거래판에 올리기/내리기 (최대 6개)</small></div>
+          <div id="tb-inv" class="tb-inv"></div>
+        </div>
+        <div class="tb-foot">
+          <p id="tb-status"></p>
+          <button id="tb-ready-btn" class="btn primary">거래 확정하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="config.js"></script>
+  <script src="art.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
